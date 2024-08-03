@@ -7,4 +7,3 @@
         public Person Character { get; set; } = new();
     }
 }
-
