@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TVMazeAPI.Interfaces;
+using TVMazeAPI.Models;
 
 namespace TVMazeAPI.Controllers;
 
@@ -18,22 +19,33 @@ public class TVMazeAPIController : ControllerBase
     [Route("GetTVShowsWithCasts")]
     public async Task<IActionResult> GetTVShowsWithCasts(int pageNumber, int numberOfObjectsPerPage)
     {
+        
         try
         {
             var showsList = await _showDetailsService.GetShowsWithCastDetails();
 
+            var totalPage = (int)Math.Ceiling((decimal)showsList.Count / numberOfObjectsPerPage);
+
+            if (pageNumber <= 0 || pageNumber > totalPage)
+            {
+                return StatusCode(400, "Page number should be greater than 0 and smaller than total page number");
+            }
+
             var paginatedShowsList = showsList
                          .Skip(numberOfObjectsPerPage * (pageNumber - 1))
-                         .Take(numberOfObjectsPerPage);
+                         .Take(numberOfObjectsPerPage).ToList();
 
-
-            if (numberOfObjectsPerPage > showsList.Count)
+          
+            var paginatedResult = new ShowsPagination
             {
-                numberOfObjectsPerPage = showsList.Count;
-                paginatedShowsList = showsList;
-            }
+                Shows = paginatedShowsList,
+                CurrentPage = pageNumber,
+                PreviousPage = ((numberOfObjectsPerPage >= showsList.Count) || (pageNumber == 1)) ? null : pageNumber - 1,
+                NextPage = ((numberOfObjectsPerPage >= showsList.Count) || (pageNumber == totalPage)) ? null : pageNumber + 1,
+                TotalPage = totalPage,
+            };
                
-            return Ok(paginatedShowsList);
+            return Ok(paginatedResult);
             
         }
         catch (Exception ex)
