@@ -28,7 +28,7 @@ public class TVMazeAPIController : ControllerBase
 
             if (pageNumber <= 0 || pageNumber > totalPage)
             {
-                return StatusCode(400, "Page number should be greater than 0 and smaller than total page number");
+                return StatusCode(400, "Page number should be greater than 0 and smaller or equal than total page number");
             }
 
             var paginatedShowsList = showsList
