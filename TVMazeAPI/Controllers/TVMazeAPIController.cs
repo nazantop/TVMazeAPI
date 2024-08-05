@@ -30,15 +30,10 @@ public class TVMazeAPIController : ControllerBase
             {
                 return StatusCode(400, "Page number should be greater than 0 and smaller or equal than total page number");
             }
-
-            var paginatedShowsList = showsList
-                         .Skip(numberOfObjectsPerPage * (pageNumber - 1))
-                         .Take(numberOfObjectsPerPage).ToList();
-
           
             var paginatedResult = new ShowsPagination
             {
-                Shows = paginatedShowsList,
+                Shows = showsList.Skip(numberOfObjectsPerPage * (pageNumber - 1)).Take(numberOfObjectsPerPage).ToList(),
                 CurrentPage = pageNumber,
                 PreviousPage = ((numberOfObjectsPerPage >= showsList.Count) || (pageNumber == 1)) ? null : pageNumber - 1,
                 NextPage = ((numberOfObjectsPerPage >= showsList.Count) || (pageNumber == totalPage)) ? null : pageNumber + 1,
